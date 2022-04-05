@@ -1,0 +1,15 @@
+Run file :
+
+
+
+Anaconda console:
+
+cd H:\Documents\ING3\Dataviz\Projet
+
+H:
+
+python -m http.server
+
+Navigateur : 
+
+http://127.0.0.1:8000/projet.html

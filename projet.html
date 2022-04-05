@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<body>
+<div id='dashboard'>
+        <div id="searchbar" style="width:100%; height:100%;"></div>
+        <button class="favorite styled"type="button" onclick="reset()"> Reset equipements </button>
+</div>
+
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js">
+</script>
+<script type="text/javascript" src="autocomplete.js"></script>
+
+<link rel="stylesheet" href="style.css"/>
+
+
+<script>
+
+var data_equipement = null;
+var data_personnel = null;
+var selected_data =[]
+//request to get data 
+$.ajax({
+    'async': false,
+    'global': false,
+    'url': "./data/russia_losses_personnel.json",
+    'dataType': "json",
+    'success': function (data) {
+        data_personnel = data;
+    }
+});
+
+$.ajax({
+    'async': false,
+    'global': false,
+    'url': "./data/russia_losses_equipement.json",
+    'dataType': "json",
+    'success': function (data) {
+        data_equipement = data;
+    }
+});
+
+
+//console.log(data_equipement)
+
+// search bar
+ function reset(){
+    selected_data = []
+    console.log(selected_data)
+}
+ //Call back for when user selects an option
+ function SearchBox(data_equipement){
+
+
+    this.key =function keys(){
+       var initial_keys = d3.keys(data_equipement[0])
+       const newArray = initial_keys.filter((item) => item !=="date")
+       const keys = newArray.filter((item) => item !=="day")
+       return (keys)
+        
+    }
+    
+    function onSelect(d) {
+
+        if(selected_data.indexOf(d)===-1){
+             selected_data.push(d) 
+
+        }
+        console.log(selected_data)
+       
+    
+    }
+    
+    //Setup and render the autocomplete
+    this.start = function start() {
+        keys= this.key()
+        
+        var bar = autocomplete(document.getElementById('searchbar'))
+                .keys(keys)
+                .dataField("State")
+                .placeHolder("Equipements to choose")
+                .width(960)
+                .height(500)
+                .onSelected(onSelect)
+                .render();
+    }
+    
+}
+
+const sb = new SearchBox(data_equipement)
+sb.start()
+
+</script>
