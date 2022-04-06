@@ -38,6 +38,7 @@ function autocomplete(parent) {
                 .attr("height", __height);
 
             var input = enter.append("input")
+                        .attr("id","form")
                         .attr("class", "form-control")
                         .attr("placeholder",_placeHolder)
                         .attr("type","text")
@@ -50,31 +51,47 @@ function autocomplete(parent) {
             hideSearching();
             hideDropDown();
 
+           document.getElementById("dashboard").addEventListener('mouseleave',hide_onOut)
            
 
             function onKeyUp() {
                 _searchTerm=input.node().value;
                 var e=d3.event;
-                
-                                if (!(e.which == 38 || e.which == 40 || e.which == 13)) {
+                 
+                if  (!(e.which == 38 || e.which == 40 || e.which == 13)) {
+                    
                     if (!_searchTerm || _searchTerm == "") {
+                        
+                        _matches=[];
+                        processResults();
+                        
                         showSearching("No results");
+                        
+                        
                     }
+                    
                     else if (isNewSearchNeeded(_searchTerm,_lastSearchTerm)) {
+
                         _lastSearchTerm=_searchTerm;
                         _currentIndex=-1;
                         _results=[];
-                        showSearching();
+                        //showSearching();
                         search();
-                        processResults();
+                        
                         if (_matches.length == 0) {
+                            _matches=[];
+                            console.log(_searchTerm)
+                            processResults();
                             showSearching("No results");
+                            showDropDown();
                         }
+                        
                         else {
+                            processResults();
                             hideSearching();
                             showDropDown();
                         }
-
+                        
                     }
 
                 }
@@ -146,8 +163,12 @@ function autocomplete(parent) {
                 _selectedFunction(d);
             }
 
+            function hide_onOut(){
+                hideDropDown();
+            }
+
             function isNewSearchNeeded(newTerm, oldTerm) {
-                return newTerm.length >= _minLength && newTerm != oldTerm;
+                return ((newTerm.length >= _minLength && newTerm != oldTerm)||(_matches.length===0));
             }
 
             function hideSearching() {
@@ -168,6 +189,7 @@ function autocomplete(parent) {
             }
 
         });
+        
     }
 
 
@@ -179,7 +201,10 @@ function autocomplete(parent) {
     function defaultSelected(d) {
         console.log(d + " selected");
     }
-
+    component.resetText =function (_){
+       var form=  d3.selectAll("form")
+       console.log(form.getAttribute())
+    }
 
     component.render = function() {
         measure();
