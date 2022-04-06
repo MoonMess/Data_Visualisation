@@ -51,8 +51,8 @@ function autocomplete(parent) {
             hideSearching();
             hideDropDown();
 
-           document.getElementById("dashboard").addEventListener('mouseleave',hide_onOut)
-           
+           document.getElementById("dashboard").addEventListener('mouseleave',hide_onOut);
+           document.getElementById("dashboard").addEventListener('mouseenter',show_onIn);
 
             function onKeyUp() {
                 _searchTerm=input.node().value;
@@ -166,7 +166,13 @@ function autocomplete(parent) {
             function hide_onOut(){
                 hideDropDown();
             }
-
+            
+            function show_onIn(){
+                if(_searchTerm!=undefined){
+                    showDropDown();
+                }
+                
+            }
             function isNewSearchNeeded(newTerm, oldTerm) {
                 return ((newTerm.length >= _minLength && newTerm != oldTerm)||(_matches.length===0));
             }
