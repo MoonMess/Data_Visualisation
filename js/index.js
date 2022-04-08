@@ -20,6 +20,7 @@ var yScale = d3.scale.linear()
 var color = d3.scale.ordinal().range(["#48A36D",  "#56AE7C",  "#64B98C", "#72C39B", "#80CEAA", "#80CCB3", "#7FC9BD", "#7FC7C6", "#7EC4CF", "#7FBBCF", "#7FB1CF", "#80A8CE", "#809ECE", "#8897CE", "#8F90CD", "#9788CD", "#9E81CC", "#AA81C5", "#B681BE", "#C280B7", "#CE80B0", "#D3779F", "#D76D8F", "#DC647E", "#E05A6D", "#E16167", "#E26962", "#E2705C", "#E37756", "#E38457", "#E39158", "#E29D58", "#E2AA59", "#E0B15B", "#DFB95C", "#DDC05E", "#DBC75F", "#E3CF6D", "#EAD67C", "#F2DE8A"]);  
 
 
+
 var xAxis = d3.svg.axis()
     .scale(xScale)
     .orient("bottom");
@@ -33,7 +34,7 @@ var line = d3.svg.line()
     .interpolate("basis")
     .x(function(d) { return xScale(d.date); })
     .y(function(d) { return yScale(d.rating); })
-    .defined(function(d) { return d.rating; });  // Hiding line value defaults of 0 for missing data
+    .defined(function(d) { return true; });  // Hiding line value defaults of 0 for missing data
 
 var maxY; // Defined later to update yAxis
 
@@ -54,7 +55,7 @@ svg.append("rect")
 
 
 d3.csv("data/russia_losses_equipment.csv", function(error, data) {
-    //console.log(data)
+    //
   color.domain(d3.keys(data[0]).filter(function(key) { // Set the domain of the color ordinal scale to be all the csv headers except "date", matching a color to an issue
     return key !== "date" && key !== "day"; 
   }));
@@ -78,9 +79,11 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
       };
     });
 
+  global_data=categories;
+
   xScale.domain(d3.extent(data, function(d) { return d.date; })); // extent = highest and lowest points, domain is data, range is bouding box
 
-  yScale.domain([0, 100
+  yScale.domain([-1, 100
     //d3.max(categories, function(c) { return d3.max(c.values, function(v) { return v.rating; }); })
   ]);
 
@@ -103,7 +106,7 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text("Issues Rating");
-
+ 
   var issue = svg.selectAll(".issue")
       .data(categories) // Select nested data and append to new svg group elements
     .enter().append("g")
@@ -123,6 +126,8 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
 
   // draw legend
   var legendSpace = 450 / categories.length; // 450/number of issues (ex. 40)    
+   
+  global_issue=issue;
 
   issue.append("rect")
       .attr("width", 10)
@@ -135,25 +140,15 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
       .attr("class", "legend-box")
 
       .on("click", function(d){ // On click make d.visible 
+        console.log(global_data)
+        console.log("test")
         d.visible = !d.visible; // If array key for this data selection is "visible" = true then make it false, if false then make it true
 
-        maxY = findMaxY(categories); // Find max Y rating value categories data with "visible"; true
-        yScale.domain([0,maxY]); // Redefine yAxis domain based on highest y value of categories data with "visible"; true
-        svg.select(".y.axis")
-          .transition()
-          .call(yAxis);   
+       
+        refresh_graph(categories,issue);  
 
-        issue.select("path")
-          .transition()
-          .attr("d", function(d){
-            return d.visible ? line(d.values) : null; // If d.visible is true then draw line for this d selection
-          })
 
-        issue.select("rect")
-          .transition()
-          .attr("fill", function(d) {
-          return d.visible ? color(d.name) : "#F1F1F2";
-        });
+
       })
 
       .on("mouseover", function(d){
@@ -205,7 +200,7 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
 
   var columnNames = d3.keys(data[0]) //grab the key values from your first data row
                                      //these are the same as your column names
-                  .slice(1); //remove the first column name (`date`);
+                  .slice(2); //remove the first column and second name (`date`,'day');
 
   var focus = issue.select("g") // create group elements to house tooltip text
       .data(columnNames) // bind each column name date to each g element
@@ -260,8 +255,10 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
       focus.select("text").text(function(columnName){
          //because you didn't explictly set any data on the <text>
          //elements, each one inherits the data from the focus <g>
-         console.log(d)
-         return (d[columnName]);
+          
+          return (d[columnName]);
+         
+         
       });
   };       
 
@@ -276,3 +273,28 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
     });
     return d3.max(maxYValues);
   }
+
+
+function refresh_graph(global_data,global_issue){
+
+
+        maxY = findMaxY(global_data); // Find max Y rating value categories data with "visible"; true
+        yScale.domain([-1,maxY]);
+         // Redefine yAxis domain based on highest y value of categories data with "visible"; true
+        svg.select(".y.axis")
+          .transition()
+          .call(yAxis);   
+
+        global_issue.select("path")
+          .transition()
+          .attr("d", function(d){
+            return d.visible ? line(d.values) : null; // If d.visible is true then draw line for this d selection
+          })
+
+        global_issue.select("rect")
+          .transition()
+          .attr("fill", function(d) {
+          return d.visible ? color(d.name) : "#F1F1F2";
+        });
+
+}
