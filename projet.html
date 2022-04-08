@@ -7,9 +7,19 @@
         <div id='graph_part'>
 
         </div>
+        
         <div id='bar_part'> 
                  <div id="searchbar" style="width:100%; height:100%;"></div>
                  <button class="reset"type="button" onclick="reset()"> Reset equipements </button>
+                 <center>
+                 <b>Cumulator</b>
+                 <div id='text-checkbox' class='text-checkbox'> </div>
+                 <label class="switch"> 
+
+                    <input type="checkbox" onchange="decumulated();" name="cumul">
+                    <span class="slider round"></span>
+                 </label>
+                 </center>
         </div>
 </div>
 
@@ -25,9 +35,11 @@
 
 <script>
 
-var data_equipement = null;
-var data_personnel = null;
-var selected_data =[]
+
+var global_data=undefined;
+var global_issue=undefined;
+var cumulated= true;
+
 //request to get data 
 $.ajax({
     'async': false,
@@ -52,10 +64,53 @@ $.ajax({
 
 //console.log(data_equipement)
 
+//button 
+
+function decumulated(){
+    //console.log(global_data[0]);
+    
+    global_data.map(function(d){
+    if (!cumulated){
+        
+        d.values.map(function(curr,i,d){ 
+        if(i!==0){
+            //console.log(d.rating);
+            //console.log(d)
+            return(d[i].rating +=d[i-1].rating)
+        }else{return d[i]}
+
+        }) 
+               
+                
+        }
+    else{
+        
+        d.values.map(function(curr,i,d){  
+            if(i!==d.length-1){
+            //console.log(d.rating);  
+            return(d[d.length-i-1].rating -= d[d.length-i-2].rating)
+        }else{return d[i]}
+
+        }) 
+        }
+     
+    });
+
+    cumulated = !cumulated;
+    //console.log(global_data[1]);
+    refresh_graph(global_data,global_issue);
+    
+    }
+
+
+
 // search bar
  function reset(){
-    selected_data = []
-    
+    global_data.forEach(function(d){
+        //console.log(d)
+        d.visible = false;
+    })
+    refresh_graph(global_data,global_issue)
     }
 
  //Call back for when user selects an option
@@ -71,14 +126,17 @@ $.ajax({
     }
     
     function onSelect(d) {
+        global_data[global_data.findIndex(i => i.name===d)].visible = !(global_data[global_data.findIndex(i => i.name===d)].visible)
 
+         refresh_graph(global_data,global_issue)
+        /*
         if(selected_data.indexOf(d)===-1){
              selected_data.push(d) 
 
         }
-
+        */
         setTimeout(document.getElementById("form").value="",50)
-        console.log(selected_data)
+        
        
     
     }

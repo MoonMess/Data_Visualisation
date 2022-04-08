@@ -80,7 +80,7 @@ function autocomplete(parent) {
                         
                         if (_matches.length == 0) {
                             _matches=[];
-                            console.log(_searchTerm)
+                            //console.log(_searchTerm)
                             processResults();
                             showSearching("No results");
                             showDropDown();
