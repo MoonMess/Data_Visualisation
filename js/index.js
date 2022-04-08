@@ -16,8 +16,8 @@ var xScale = d3.time.scale()
 var yScale = d3.scale.linear()
     .range([height, 0]);
 
-// 40 Custom DDV colors 
-var color = d3.scale.ordinal().range(["#48A36D",  "#56AE7C",  "#64B98C", "#72C39B", "#80CEAA", "#80CCB3", "#7FC9BD", "#7FC7C6", "#7EC4CF", "#7FBBCF", "#7FB1CF", "#80A8CE", "#809ECE", "#8897CE", "#8F90CD", "#9788CD", "#9E81CC", "#AA81C5", "#B681BE", "#C280B7", "#CE80B0", "#D3779F", "#D76D8F", "#DC647E", "#E05A6D", "#E16167", "#E26962", "#E2705C", "#E37756", "#E38457", "#E39158", "#E29D58", "#E2AA59", "#E0B15B", "#DFB95C", "#DDC05E", "#DBC75F", "#E3CF6D", "#EAD67C", "#F2DE8A"]);  
+// 17 Custom DDV colors 
+var color = d3.scale.ordinal().range([  "#7FFFD4",   "#0000FF", "#A52A2A", "#8A2BE2", "#7FFF00", "#FF7F50", "#DC143C", "#B8860B", "#006400", "#FF8C00", "#FF1493", "#FFD700", "#4B0082", "#808000", "#9E81CC", "#FF0000", "#8B4513"]);  
 
 
 
@@ -56,9 +56,11 @@ svg.append("rect")
 
 d3.csv("data/russia_losses_equipment.csv", function(error, data) {
     //
+  keys=d3.keys(data[0])
   color.domain(d3.keys(data[0]).filter(function(key) { // Set the domain of the color ordinal scale to be all the csv headers except "date", matching a color to an issue
     return key !== "date" && key !== "day"; 
   }));
+  
 
   data.forEach(function(d) { // Make every date in the csv data a javascript date object format
     d.date = parseDate(String(d.date));
