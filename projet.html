@@ -4,6 +4,7 @@
 
 <body>
 <div id='dashboard' class='dashboard'>
+        <div class='title'> Ukrain war Dashboard </div>
         <div id='graph_part'>
 
         </div>
@@ -12,8 +13,8 @@
                  <div id="searchbar" style="width:100%; height:100%;"></div>
                  <button class="reset"type="button" onclick="reset()"> Reset equipements </button>
                  <center>
-                 <b>Cumulator</b>
-                 <div id='text-checkbox' class='text-checkbox'> </div>
+                 
+                 <div id='text-checkbox' class='text-checkbox'> Données  cumulées </div>
                  <label class="switch"> 
 
                     <input type="checkbox" onchange="decumulated();" name="cumul">
@@ -39,43 +40,20 @@
 var global_data=undefined;
 var global_issue=undefined;
 var cumulated= true;
+var keys=undefined;
 
-//request to get data 
-$.ajax({
-    'async': false,
-    'global': false,
-    'url': "./data/russia_losses_personnel.json",
-    'dataType': "json",
-    'success': function (data) {
-        data_personnel = data;
-    }
-});
-
-$.ajax({
-    'async': false,
-    'global': false,
-    'url': "./data/russia_losses_equipement.json",
-    'dataType': "json",
-    'success': function (data) {
-        data_equipement = data;
-    }
-});
-
-
-//console.log(data_equipement)
 
 //button 
 
 function decumulated(){
-    //console.log(global_data[0]);
+    
     
     global_data.map(function(d){
     if (!cumulated){
         
         d.values.map(function(curr,i,d){ 
         if(i!==0){
-            //console.log(d.rating);
-            //console.log(d)
+            
             return(d[i].rating +=d[i-1].rating)
         }else{return d[i]}
 
@@ -87,7 +65,7 @@ function decumulated(){
         
         d.values.map(function(curr,i,d){  
             if(i!==d.length-1){
-            //console.log(d.rating);  
+           
             return(d[d.length-i-1].rating -= d[d.length-i-2].rating)
         }else{return d[i]}
 
@@ -95,9 +73,13 @@ function decumulated(){
         }
      
     });
-
+    if (cumulated===false){
+        document.getElementById('text-checkbox').innerHTML='Données cumulées'
+    }else{
+        document.getElementById('text-checkbox').innerHTML='Données non cumulées'
+    }
+    
     cumulated = !cumulated;
-    //console.log(global_data[1]);
     refresh_graph(global_data,global_issue);
     
     }
@@ -117,24 +99,12 @@ function decumulated(){
  function SearchBox(data_equipement){
 
 
-    this.key =function keys(){
-       var initial_keys = d3.keys(data_equipement[0])
-       const newArray = initial_keys.filter((item) => item !=="date")
-       const keys = newArray.filter((item) => item !=="day")
-       return (keys)
-        
-    }
     
     function onSelect(d) {
         global_data[global_data.findIndex(i => i.name===d)].visible = !(global_data[global_data.findIndex(i => i.name===d)].visible)
 
-         refresh_graph(global_data,global_issue)
-        /*
-        if(selected_data.indexOf(d)===-1){
-             selected_data.push(d) 
-
-        }
-        */
+        refresh_graph(global_data,global_issue)
+        
         setTimeout(document.getElementById("form").value="",50)
         
        
@@ -143,11 +113,9 @@ function decumulated(){
     
     //Setup and render the autocomplete
     this.start = function start() {
-        keys= this.key()
         
         var bar = autocomplete(document.getElementById('searchbar'))
                 .keys(keys)
-                .dataField("State")
                 .placeHolder("Equipements to choose")
                 .width(960)
                 .height(500)
@@ -156,9 +124,10 @@ function decumulated(){
     }
     
 }
-
-const sb = new SearchBox(data_equipement)
-sb.start()
+$( document ).ready(function() {
+    const sb = new SearchBox(global_data)
+    sb.start()
+})
 
 </script>
 </head>

@@ -248,20 +248,27 @@ p {
 }
 /* The switch - the box around the slider */
 .switch {
+   
   position: relative;
   display: inline-block;
   width: 60px;
   height: 34px;
+  right: 420px;
+  bottom: 25px;
   margin-left: 20px;
   margin-bottom: 20px;
+
 }
 .text-checkbox{
-   
-    float :right;
+    font-size: 16px;
+    left: 330px;
+    bottom:130px;
+    position :absolute;
 
 }
 /* Hide default HTML checkbox */
 .switch input {
+  top:  10px;
   opacity: 0;
   width: 0;
   height: 0;
@@ -308,6 +315,7 @@ input:checked + .slider:before {
 
 /* Rounded sliders */
 .slider.round {
+  
   border-radius: 34px;
 }
 
@@ -1013,6 +1021,11 @@ input[type="checkbox"] {
     left: 20px;
 }
 
+.title{
+    position: absolute;
+    left : 300px;
+    font-size: 20px;
+}
 .right-carousel {
     right: 20px;
 }
