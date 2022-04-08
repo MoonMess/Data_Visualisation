@@ -22,11 +22,8 @@ var color = d3.scale.ordinal().range(["#48A36D",  "#56AE7C",  "#64B98C", "#72C39
 
 var xAxis = d3.svg.axis()
     .scale(xScale)
-    .orient("bottom"),
-
-    xAxis2 = d3.svg.axis() // xAxis for brush slider
-    .scale(xScale2)
-    .orient("bottom");    
+    .orient("bottom");
+ 
 
 var yAxis = d3.svg.axis()
     .scale(yScale)
@@ -55,26 +52,11 @@ svg.append("rect")
     .attr("id", "mouse-tracker")
     .style("fill", "white"); 
 
-//for slider part-----------------------------------------------------------------------------------
-  
-var context = svg.append("g") // Brushing context box container
-    .attr("transform", "translate(" + 0 + "," + 410 + ")")
-    .attr("class", "context");
-
-//append clip path for lines plotted, hiding those part out of bounds
-svg.append("defs")
-  .append("clipPath") 
-    .attr("id", "clip")
-    .append("rect")
-    .attr("width", width)
-    .attr("height", height); 
-
-//end slider part----------------------------------------------------------------------------------- 
 
 d3.csv("data/russia_losses_equipment.csv", function(error, data) {
     console.log(data)
   color.domain(d3.keys(data[0]).filter(function(key) { // Set the domain of the color ordinal scale to be all the csv headers except "date", matching a color to an issue
-    return key !== "date" ; 
+    return key !== "date" && key !== "day"; 
   }));
 
   data.forEach(function(d) { // Make every date in the csv data a javascript date object format
@@ -104,38 +86,7 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
 
   xScale2.domain(xScale.domain()); // Setting a duplicate xdomain for brushing reference later
  
- //for slider part-----------------------------------------------------------------------------------
-
- var brush = d3.svg.brush()//for slider bar at the bottom
-    .x(xScale2) 
-    .on("brush", brushed);
-
-  context.append("g") // Create brushing xAxis
-      .attr("class", "x axis1")
-      .attr("transform", "translate(0," + height2 + ")")
-      .call(xAxis2);
-
-  var contextArea = d3.svg.area() // Set attributes for area chart in brushing context graph
-    .interpolate("monotone")
-    .x(function(d) { return xScale2(d.date); }) // x is scaled to xScale2
-    .y0(height2) // Bottom line begins at height2 (area chart not inverted) 
-    .y1(0); // Top line of area, 0 (area chart not inverted)
-
-  //plot the rect as the bar at the bottom
-  context.append("path") // Path is created using svg.area details
-    .attr("class", "area")
-    .attr("d", contextArea(categories[0].values)) // pass first categories data .values to area path generator 
-    .attr("fill", "#F1F1F2");
-    console.log(categories[0.])
-  //append the brush for the selection of subsection  
-  context.append("g")
-    .attr("class", "x brush")
-    .call(brush)
-    .selectAll("rect")
-    .attr("height", height2) // Make brush rects same height 
-      .attr("fill", "#E6E7E8");  
-  //end slider part-----------------------------------------------------------------------------------
-
+ 
   // draw line graph
   svg.append("g")
       .attr("class", "x axis")
@@ -291,7 +242,6 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
       
       d3.select("#hover-line") // select hover-line and changing attributes to mouse position
           .attr("x1", mouse_x) 
-          .attr("x2", mouse_x)
           .style("opacity", 1); // Making line visible
 
       // Legend tooltips // http://www.d3noob.org/2014/07/my-favourite-tooltip-method-for-line.html
@@ -313,31 +263,7 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
 
          return (d[columnName]);
       });
-  }; 
-
-  //for brusher of the slider bar at the bottom
-  function brushed() {
-
-    xScale.domain(brush.empty() ? xScale2.domain() : brush.extent()); // If brush is empty then reset the Xscale domain to default, if not then make it the brush extent 
-
-    svg.select(".x.axis") // replot xAxis with transition when brush used
-          .transition()
-          .call(xAxis);
-
-    maxY = findMaxY(categories); // Find max Y rating value categories data with "visible"; true
-    yScale.domain([0,maxY]); // Redefine yAxis domain based on highest y value of categories data with "visible"; true
-    
-    svg.select(".y.axis") // Redraw yAxis
-      .transition()
-      .call(yAxis);   
-
-    issue.select("path") // Redraw lines based on brush xAxis scale and domain
-      .transition()
-      .attr("d", function(d){
-          return d.visible ? line(d.values) : null; // If d.visible is true then draw line for this d selection
-      });
-    
-  };      
+  };       
 
 }); // End Data callback function
   
