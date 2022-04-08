@@ -51,8 +51,8 @@ function autocomplete(parent) {
             hideSearching();
             hideDropDown();
 
-           document.getElementById("dashboard").addEventListener('mouseleave',hide_onOut);
-           document.getElementById("dashboard").addEventListener('mouseenter',show_onIn);
+           document.getElementById("bar_part").addEventListener('mouseleave',hide_onOut);
+           document.getElementById("bar_part").addEventListener('mouseenter',show_onIn);
 
             function onKeyUp() {
                 _searchTerm=input.node().value;
