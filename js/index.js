@@ -37,7 +37,7 @@ var line = d3.svg.line()
 
 var maxY; // Defined later to update yAxis
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#graph_part").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom) //height + margin.top + margin.bottom
   .append("g")
@@ -54,14 +54,14 @@ svg.append("rect")
 
 
 d3.csv("data/russia_losses_equipment.csv", function(error, data) {
-    console.log(data)
+    //console.log(data)
   color.domain(d3.keys(data[0]).filter(function(key) { // Set the domain of the color ordinal scale to be all the csv headers except "date", matching a color to an issue
     return key !== "date" && key !== "day"; 
   }));
 
   data.forEach(function(d) { // Make every date in the csv data a javascript date object format
     d.date = parseDate(String(d.date));
-    console.log(d.date)
+    //console.log(d.date)
   });
 
   var categories = color.domain().map(function(name) { // Nest the data into an array of objects with new keys
@@ -260,7 +260,7 @@ d3.csv("data/russia_losses_equipment.csv", function(error, data) {
       focus.select("text").text(function(columnName){
          //because you didn't explictly set any data on the <text>
          //elements, each one inherits the data from the focus <g>
-
+         console.log(d)
          return (d[columnName]);
       });
   };       
